@@ -26,81 +26,322 @@
 			<div class="slides">
 				<section class="intro-slide">
 					<img class="logo" src="img/logo-positive.svg" alt="Quantlane">
-					<h1>Talk title</h1>
-					<h2>Name Surname <span class="divider">|</span> Event name</h2>
-					<h3><span>Month XX, 201X</span></h3>
-				</section>
-
-
-				<section>
-					<h2>Speaker's personal intro</h2>
-					<ul>
-						<li class="fragment">Stuff</li>
-						<li class="fragment">Stuff</li>
-						<li class="fragment">Stuff</li>
-					</ul>
+					<h1>Python, Docker, Kubernetes, and beyond?</h1>
+					<h2>Peter Bábics <span class="divider">|</span> EuroPython 2018</h2>
+					<h3><span>July 25, 2018</span></h3>
 				</section>
 
 
 				<section>
 					<h2 class="logo-heading"><img src="img/logo-positive-horizontal.svg" alt="Quantlane"></h2>
 					<ul>
-						<li class="fragment">Small focused team</li>
-						<li class="fragment">We develop a trading platform and strategies</li>
-						<li class="fragment">All back-end code is Python 3.5</li>
-						<li class="fragment">We also like numpy, ReactJS, Redis, Kafka, PostgreSQL, TensorFlow, &hellip;</li>
+						<li class="fragment">Based in Prague</li>
+						<li class="fragment">Small team of developers</li>
+						<li class="fragment">Developing trading platform and strategies</li>
+						<li class="fragment">Using OpenSource</li>
 					</ul>
 				</section>
 
 
+			<section>
+				<h2>Our trading platform and tooling around</h2>
+				<ul>
+					<li class="fragment">Python 3.6 + React.js</li>
+					<li class="fragment">Asyncio</li>
+					<li class="fragment">Redis / TimescaleDB for storage</li>
+					<li class="fragment">Integrating third party libraries using cython</li>
+					<li class="fragment">Multiple instances</li>
+					<li class="fragment">Messaging - Kafka / Rabbit</li>
+				</ul>
+			</section>
+
+
+			<section>
 				<section>
-					<h2>Title</h2>
+					<!-- Typo -->
+					<h2>In the beginning</h2>
+					<h4 class="fragment">There was chaos</h4>
+				</section>
+
+
+				<section>
+					<h2>In the beginning</h2>
 					<ul>
-						<li class="fragment">Stuff</li>
-						<li class="fragment">Stuff</li>
-						<li class="fragment">Stuff</li>
+						<li class="fragment">Applications deployed on physical servers</li>
+						<li class="fragment">Running in `circus`</li>
+						<li class="fragment">Packages installed in `virtualenv`</li>
+						<li class="fragment">Under one user</li>
 					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Apps per server = multiple instances per node</li>
+							<li>Circus = supervisord like process management system</li>
+						</ul>
+					</aside>
 				</section>
 
 
 				<section>
-					<h2>Code</h2>
-					<pre><code class="python" data-trim data-noescape>
-	<mark>print</mark>('Hello world')
-					</code></pre>
+					<h2>Pros / Cons</h2>
+					<ul>
+						<li class="fragment">Simple implementation and deployment</li>
+						<!-- split into separate paragprahs prons and cons first pros, then cons -->
+						<li class="fragment">Package versioning "hell"</li>
+						<li class="fragment">No failover</li>
+						<li class="fragment">Complicated migration because of filesystem state</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Implementation and deployment: activate env, git pull, pip install, circus restart</li>
+							<li>
+								Package versioning hell:
+								<ul>
+									<li>cross between venv and system</li>
+									<li>No version pinning</li>
+									<li>Possibly diff env for development, CI/testing and production</li>
+								</ul>
+							</li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+
+
+			<section>
+				<section>
+					<h2>A wild blue whale appeared</h2>
+					<img src="img/docker-official.svg" alt="Docker">
+				</section>
+
+				<section>
+					<h2>Promise of brighter future</h2>
+					<ul>
+						<li class="fragment">Unified environment</li>
+						<li class="fragment">Simple deployment</li>
+						<li class="fragment">Simple migrations</li>
+						<li class="fragment">Faster Continuous Integration (CI)</li>
+						<li class="fragment">Atomic releases</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Same env across development, CI and production</li>
+							<li>deployment simple as docker-compose up</li>
+							<li>Migrations like: compose down, rsync, compose up</li>
+							<li>Faster CI, env prepared as a first step</li>
+							<li>about sequential running and that it will be described later</li>
+							<li>image is pre built and then everything is run in parallel</li>
+							<li>FS level errors mitigated by having everything bakend in image</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Migration challenges</h2>
+					<ul>
+						<li class="fragment">Image storage - <span class="fragment">Gitlab registry</span></li>
+						<li class="fragment">Image caching</li>
+						<li class="fragment">
+						Dedicated building environment
+						<pre style="width: 100%" class="fragment"><code data-trim data-noescape>
+build_job:
+	script:
+		- docker build -t $CI_IMAGE_NAME .
+</code></pre>
+						<pre style="width: 100%" class="fragment"><code data-trim data-noescape>
+build_job:
+	script:
+		- 'docker run -d -p 9000:9000 -v "/:/data" sleep 1y'
+</code></pre>
+						</li>
+						<li class="fragment">CI pipeline design</li>
+						<li class="fragment">Old images cleanup</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Same env across development, CI and production</li>
+							<li>deployment simple as docker-compose up</li>
+							<li>Migrations like: compose down, rsync, compose up</li>
+							<li>Faster CI, env prepared as a first step</li>
+							<li>FS level errors mitigated by having everything bakend in image</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Migration highlights</h2>
+					<ul>
+						<li class="fragment">Unified stable environment</li>
+						<li class="fragment">Fast builds</li>
+						<li class="fragment">Isolated environments</li>
+						<li class="fragment">Faster CI pipeline</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Stable env = what production gets is what developer sees</li>
+							<li>Fast builds - enabled by dind caching and smart Dockerfile composition</li>
+							<li>Isolation - No one can change image without exec-ing into it</li>
+							<li>Fast CI - tests run prebuilt image, nothing is installed after that phase</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<img src="img/pipeline.png" alt="pipeline" style="border: 0"/>
+					<!---
+					<ul>
+						<li class="fragment">Build docker image</li>
+						<li class="fragment">Run tests, code quality, packaging</li>
+						<li class="fragment">[Optionally] Release bleeding edge version</li>
+						<li class="fragment">[Optionally] Deploy to staging</li>
+						<li class="fragment">Run Integration tests</li>
+						<li class="fragment">Build documentation and publish it</li>
+					</ul>
+					-->
+
+					<aside class="notes">
+						<ul>
+							<li>Image = contains shared library, prod and dev packages - always</li>
+							<li>Image - around 700Mb, ubuntu based, with headers in it :(</li>
+							<li>Tests splitted into multiple jobs to make them faster (they run in parallel)</li>
+							<li>Integration tests after bleeding edge because they take long time to run</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Cons of plain docker</h2>
+					<ul>
+						<li class="fragment">Known bugs</li>
+						<li class="fragment">No failover</li>
+						<li class="fragment">Dockerd as single point of failure</li>
+					</ul>
+					<aside class="notes">
+						<ul>
+							<li>Bugs - Mem leaks, Dead locks, FS corruption</li>
+							<li></li>
+							<li>SPOF</li>
+						</ul>
+					</aside>
+				</section>
+				<section>
+					<h2>Docker gotchas</h2>
+					<ul>
+						<li class="fragment">PID 1 pitfall</li>
+						<li class="fragment">User within container</li>
+					</ul>
+				</section>
+			</section>
+
+
+			<section>
+				<section>
+					<h2><img src="img/Kubernetes_logo.svg" alt="Kubernetes"> Ahoy!</h2>
 				</section>
 
 
-				<section class="thankyou-slide" data-background-color="#000000">
-					<img class="logo" src="img/logo-negative.svg" alt="Quantlane">
-					<br>
-					<h1>Thank you</h1>
-					<h2>
-						<a href="mailto:XXX@quantlane.com"><span class="email-name">name@</span>quantlane.com</a>
-					</h2>
-					<h2>
-						<a href="https://twitter.com/quantlane" class="twitter-link">twitter.com/quantlane</a>
-					</h2>
+				<section>
+					<h2>Warmly welcomed features</h2>
+					<ul>
+						<li class="fragment">Failover when server fails</li>
+						<li class="fragment">Configuration stored in namespaces</li>
+						<li class="fragment">
+						Service Discovery
+						<pre><code data-trim data-noescape>my-svc.my-namespace.svc.cluster.local</code></pre>
+						</li>
+						<li class="fragment">Ingress support through Ingress controller</li>
+						<li class="fragment">
+						Deployment history
+						<pre class="fragment"><code data-trim data-noescape>$ kubectl rollout undo deployment midas</code></pre>
+						</li>
+	
+						<!-- describe ingress (by image ?)  as a way to expose services to outer world -->
+					</ul>
+
+					<aside class="notes">
+						<ul>
+							<li>Ingress = ay to expose services from cluster to outer world</li>
+						</ul>
+					</aside>
 				</section>
-			</div>
+
+
+				<section>
+					<h2>Current state</h2>
+					<ul>
+						<li class="fragment">In between migration</li>
+						<li class="fragment">Environment set by namespace variables</li>
+						<li class="fragment">Deployments written as jinja2 templates
+						<pre style="width: 100%"><code data-trim data-noescape>
+{% set env_type, profile_name = PROFILE.split('_', 1) %}
+{% set namespace = "data--midas-" + env_type %}
+{% set data_directory_mount = '/data' %}
+
+{%  if profile_name == 'cthulu' %}
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: api_key
+        - name: SUBSCRIPTION_INSTRUMENT_FILTER
+          value: 'False'
+{% endif %}</code></pre>
+						</li>
+						
+					</ul>
+				</section>
+
+				<section>
+					<h2>Notable features</h2>
+					<ul>
+						<li class="fragment">Probes</li>
+						<li class="fragment">Update strategy</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Update strategies - Rolling Update</h2>
+					<img src="img/rollout.png" alt="rolling update" style="border: 0"/>
+				</section>
+
+				<section>
+					<h2>Update strategies - Recreate</h2>
+					<img src="img/Recreate.png" alt="recreate" style="border: 0"/>
+				</section>
+			</section>
+
+			<!-- Backup slides: Deployment-tool, Resources, Probes -->
+
+
+			<section class="thankyou-slide" data-background-color="#000000">
+				<img class="logo" src="img/logo-negative.svg" alt="Quantlane">
+				<br>
+				<h1>Thank you</h1>
+				<h2>
+					<a href="mailto:peter.babics@quantlane.com"><span class="email-name">peter.babics@</span>quantlane.com</a>
+				</h2>
+				<h2>
+					<a href="https://github.com/qntln" class="twitter-link">github.com/qntln</a>
+				</h2>
+			</section>
 		</div>
+	</div>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
 
-		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				history: true,
+	<script>
+		// More info https://github.com/hakimel/reveal.js#configuration
+		Reveal.initialize({
+			history: true,
 
-				// More info https://github.com/hakimel/reveal.js#dependencies
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
-	</body>
+			// More info https://github.com/hakimel/reveal.js#dependencies
+			dependencies: [
+				{ src: 'plugin/markdown/marked.js' },
+				{ src: 'plugin/markdown/markdown.js' },
+				{ src: 'plugin/notes/notes.js', async: true },
+				{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+			]
+		});
+	</script>
+</body>
 </html>
