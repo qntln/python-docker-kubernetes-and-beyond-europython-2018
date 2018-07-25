@@ -37,28 +37,27 @@
 					<ul>
 						<li class="fragment">Based in Prague</li>
 						<li class="fragment">Small team of developers</li>
-						<li class="fragment">Developing trading platform and strategies</li>
-						<li class="fragment">Using OpenSource</li>
+						<li class="fragment">Developing a trading platform and strategies</li>
+						<li class="fragment">Using open source</li>
 					</ul>
 				</section>
 
 
 			<section>
-				<h2>Our trading platform and tooling around</h2>
+				<h2>Our trading platform and tooling</h2>
 				<ul>
 					<li class="fragment">Python 3.6 + React.js</li>
-					<li class="fragment">Asyncio</li>
-					<li class="fragment">Redis / TimescaleDB for storage</li>
-					<li class="fragment">Integrating third party libraries using cython</li>
-					<li class="fragment">Multiple instances</li>
-					<li class="fragment">Messaging - Kafka / Rabbit</li>
+					<li class="fragment">asyncio</li>
+					<li class="fragment">Redis &amp; TimescaleDB for storage</li>
+					<li class="fragment">Integrating third party libraries using Cython</li>
+					<li class="fragment">Dozens of processes</li>
+					<li class="fragment">Messaging - Kafka / RabbitMQ</li>
 				</ul>
 			</section>
 
 
 			<section>
 				<section>
-					<!-- Typo -->
 					<h2>In the beginning</h2>
 					<h4 class="fragment">There was chaos</h4>
 				</section>
@@ -68,9 +67,9 @@
 					<h2>In the beginning</h2>
 					<ul>
 						<li class="fragment">Applications deployed on physical servers</li>
-						<li class="fragment">Running in `circus`</li>
-						<li class="fragment">Packages installed in `virtualenv`</li>
-						<li class="fragment">Under one user</li>
+						<li class="fragment">Managed by <code>circus</code></li>
+						<li class="fragment">Packages installed in <code>virtualenv</code></li>
+						<li class="fragment">Under a single user</li>
 					</ul>
 					<aside class="notes">
 						<ul>
@@ -82,11 +81,14 @@
 
 
 				<section>
-					<h2>Pros / Cons</h2>
+					<h2>Pros</h2>
 					<ul>
 						<li class="fragment">Simple implementation and deployment</li>
-						<!-- split into separate paragprahs prons and cons first pros, then cons -->
-						<li class="fragment">Package versioning "hell"</li>
+					</ul>
+
+					<h2 class="fragment"><br>Cons</h2>
+					<ul>
+						<li class="fragment">Package versioning hell</li>
 						<li class="fragment">No failover</li>
 						<li class="fragment">Complicated migration because of filesystem state</li>
 					</ul>
@@ -110,11 +112,11 @@
 			<section>
 				<section>
 					<h2>A wild blue whale appeared</h2>
-					<img src="img/docker-official.svg" alt="Docker">
+					<img src="img/docker-official.svg" alt="Docker" class="borderless">
 				</section>
 
 				<section>
-					<h2>Promise of brighter future</h2>
+					<h2>The promise of a brighter future</h2>
 					<ul>
 						<li class="fragment">Unified environment</li>
 						<li class="fragment">Simple deployment</li>
@@ -125,12 +127,12 @@
 					<aside class="notes">
 						<ul>
 							<li>Same env across development, CI and production</li>
-							<li>deployment simple as docker-compose up</li>
+							<li>deployment as simple as docker-compose up</li>
 							<li>Migrations like: compose down, rsync, compose up</li>
 							<li>Faster CI, env prepared as a first step</li>
 							<li>about sequential running and that it will be described later</li>
 							<li>image is pre built and then everything is run in parallel</li>
-							<li>FS level errors mitigated by having everything bakend in image</li>
+							<li>FS level errors mitigated by having everything baked in the image</li>
 						</ul>
 					</aside>
 				</section>
@@ -138,7 +140,7 @@
 				<section>
 					<h2>Migration challenges</h2>
 					<ul>
-						<li class="fragment">Image storage - <span class="fragment">Gitlab registry</span></li>
+						<li class="fragment">Image storage <span class="fragment">- GitLab registry</span></li>
 						<li class="fragment">Image caching</li>
 						<li class="fragment">
 						Dedicated building environment
@@ -154,7 +156,7 @@ build_job:
 </code></pre>
 						</li>
 						<li class="fragment">CI pipeline design</li>
-						<li class="fragment">Old images cleanup</li>
+						<li class="fragment">Cleaning up old images</li>
 					</ul>
 					<aside class="notes">
 						<ul>
@@ -170,7 +172,7 @@ build_job:
 				<section>
 					<h2>Migration highlights</h2>
 					<ul>
-						<li class="fragment">Unified stable environment</li>
+						<li class="fragment">Unified, stable environment</li>
 						<li class="fragment">Fast builds</li>
 						<li class="fragment">Isolated environments</li>
 						<li class="fragment">Faster CI pipeline</li>
@@ -186,7 +188,7 @@ build_job:
 				</section>
 
 				<section>
-					<img src="img/pipeline.png" alt="pipeline" style="border: 0"/>
+					<img src="img/pipeline.png" alt="pipeline" class="borderless"/>
 					<!---
 					<ul>
 						<li class="fragment">Build docker image</li>
@@ -209,11 +211,11 @@ build_job:
 				</section>
 
 				<section>
-					<h2>Cons of plain docker</h2>
+					<h2>Cons of plain Docker</h2>
 					<ul>
 						<li class="fragment">Known bugs</li>
 						<li class="fragment">No failover</li>
-						<li class="fragment">Dockerd as single point of failure</li>
+						<li class="fragment"><code>dockerd</code> is a single point of failure</li>
 					</ul>
 					<aside class="notes">
 						<ul>
@@ -227,7 +229,7 @@ build_job:
 					<h2>Docker gotchas</h2>
 					<ul>
 						<li class="fragment">PID 1 pitfall</li>
-						<li class="fragment">User within container</li>
+						<li class="fragment">User permissions within containers</li>
 					</ul>
 				</section>
 			</section>
@@ -235,45 +237,43 @@ build_job:
 
 			<section>
 				<section>
-					<h2><img src="img/Kubernetes_logo.svg" alt="Kubernetes"> Ahoy!</h2>
+					<h2><img src="img/Kubernetes_logo.svg" alt="Kubernetes" class="borderless"> Ahoy!</h2>
 				</section>
 
 
 				<section>
 					<h2>Warmly welcomed features</h2>
 					<ul>
-						<li class="fragment">Failover when server fails</li>
+						<li class="fragment">Failover when a server fails</li>
 						<li class="fragment">Configuration stored in namespaces</li>
 						<li class="fragment">
-						Service Discovery
-						<pre><code data-trim data-noescape>my-svc.my-namespace.svc.cluster.local</code></pre>
+						Service discovery
+						<pre style="min-width: 30em"><code data-trim data-noescape>my-service.my-namespace.svc.cluster.local</code></pre>
 						</li>
-						<li class="fragment">Ingress support through Ingress controller</li>
+						<li class="fragment">Ingress controller</li>
 						<li class="fragment">
 						Deployment history
-						<pre class="fragment"><code data-trim data-noescape>$ kubectl rollout undo deployment midas</code></pre>
+						<pre class="fragment"><code data-trim data-noescape>$ kubectl rollout undo deployment my-app</code></pre>
 						</li>
-	
-						<!-- describe ingress (by image ?)  as a way to expose services to outer world -->
 					</ul>
 
 					<aside class="notes">
 						<ul>
-							<li>Ingress = ay to expose services from cluster to outer world</li>
+							<li>Ingress = a way to expose services from the cluster to the outside world</li>
 						</ul>
 					</aside>
 				</section>
 
 
 				<section>
-					<h2>Current state</h2>
+					<h2>Where we are now</h2>
 					<ul>
-						<li class="fragment">In between migration</li>
-						<li class="fragment">Environment set by namespace variables</li>
-						<li class="fragment">Deployments written as jinja2 templates
+						<li class="fragment">Migration to Kubernetes is in progress</li>
+						<li class="fragment">Environment is configured by namespace variables</li>
+						<li class="fragment">Deployments are described in Jinja2 templates
 						<pre style="width: 100%"><code data-trim data-noescape>
 {% set env_type, profile_name = PROFILE.split('_', 1) %}
-{% set namespace = "data--midas-" + env_type %}
+{% set namespace = "my-ns-" + env_type %}
 {% set data_directory_mount = '/data' %}
 
 {%  if profile_name == 'cthulu' %}
@@ -286,7 +286,7 @@ build_job:
           value: 'False'
 {% endif %}</code></pre>
 						</li>
-						
+
 					</ul>
 				</section>
 
@@ -294,23 +294,20 @@ build_job:
 					<h2>Notable features</h2>
 					<ul>
 						<li class="fragment">Probes</li>
-						<li class="fragment">Update strategy</li>
+						<li class="fragment">Update strategies</li>
 					</ul>
 				</section>
 
 				<section>
-					<h2>Update strategies - Rolling Update</h2>
-					<img src="img/rollout.png" alt="rolling update" style="border: 0"/>
+					<h2>Update strategies - Rolling update</h2>
+					<img src="img/rollout.png" alt="rolling update" class="borderless"/>
 				</section>
 
 				<section>
 					<h2>Update strategies - Recreate</h2>
-					<img src="img/Recreate.png" alt="recreate" style="border: 0"/>
+					<img src="img/Recreate.png" alt="recreate" class="borderless"/>
 				</section>
 			</section>
-
-			<!-- Backup slides: Deployment-tool, Resources, Probes -->
-
 
 			<section class="thankyou-slide" data-background-color="#000000">
 				<img class="logo" src="img/logo-negative.svg" alt="Quantlane">
