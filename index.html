@@ -1,0 +1,276 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Quantlane</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/quantlane.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section class="intro-slide">
+					<img class="logo" src="img/logo-positive.svg" alt="Quantlane">
+					<h1>Python, Docker, Kubernetes, and beyond?</h1>
+					<h2>Peter Bábics <span class="divider">|</span> EuroPython 2018</h2>
+					<h3><span>July 25, 2018</span></h3>
+				</section>
+
+
+				<section>
+					<h2 class="logo-heading"><img src="img/logo-positive-horizontal.svg" alt="Quantlane"></h2>
+					<ul>
+						<li class="fragment">Based in Prague</li>
+						<li class="fragment">Small team of developers</li>
+						<li class="fragment">Developing a trading platform and strategies</li>
+						<li class="fragment">Using open source</li>
+					</ul>
+				</section>
+
+
+			<section>
+				<h2>Our trading platform and tooling</h2>
+				<ul>
+					<li class="fragment">Python 3.6 + React.js</li>
+					<li class="fragment">asyncio</li>
+					<li class="fragment">Redis &amp; TimescaleDB for storage</li>
+					<li class="fragment">Integrating third party libraries using Cython</li>
+					<li class="fragment">Dozens of processes</li>
+					<li class="fragment">Messaging - Kafka / RabbitMQ</li>
+				</ul>
+			</section>
+
+
+			<section>
+				<section>
+					<h2>In the beginning</h2>
+					<h4 class="fragment">There was chaos</h4>
+				</section>
+
+
+				<section>
+					<h2>In the beginning</h2>
+					<ul>
+						<li class="fragment">Applications deployed on physical servers</li>
+						<li class="fragment">Managed by <code>circus</code></li>
+						<li class="fragment">Packages installed in <code>virtualenv</code></li>
+						<li class="fragment">Under a single user</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h2>Pros</h2>
+					<ul>
+						<li class="fragment">Simple implementation and deployment</li>
+					</ul>
+
+					<h2 class="fragment"><br>Cons</h2>
+					<ul>
+						<li class="fragment">Package versioning hell</li>
+						<li class="fragment">No failover</li>
+						<!-- <li class="fragment">Complicated migration because of filesystem state</li> -->
+					</ul>
+				</section>
+			</section>
+
+
+			<section>
+				<section>
+					<h2>A wild blue whale appeared</h2>
+					<img src="img/docker-official.svg" alt="Docker" class="borderless">
+				</section>
+
+				<section>
+					<h2>The promise of a brighter future</h2>
+					<ul>
+						<li class="fragment">Unified environment</li>
+						<li class="fragment">Simple deployment</li>
+						<li class="fragment">Simple migrations</li>
+						<li class="fragment">Faster Continuous Integration (CI)</li>
+						<li class="fragment">Atomic releases</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Migration challenges</h2>
+					<ul>
+						<li class="fragment">Image storage <span class="fragment">- GitLab registry</span></li>
+						<li class="fragment">Image caching</li>
+						<li class="fragment">
+						Dedicated building environment
+						<pre style="width: 100%" class="fragment"><code data-trim data-noescape>
+build_job:
+	script:
+		- docker build -t $CI_IMAGE_NAME .
+</code></pre>
+						<pre style="width: 100%" class="fragment"><code data-trim data-noescape>
+build_job:
+	script:
+		- 'docker run -d -p 9000:9000 -v "/:/data" sleep 1y'
+</code></pre>
+						</li>
+						<li class="fragment">CI pipeline design</li>
+						<li class="fragment">Cleaning up old images</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Migration highlights</h2>
+					<ul>
+						<li class="fragment">Unified, stable environment</li>
+						<li class="fragment">Fast builds</li>
+						<li class="fragment">Isolated environments</li>
+						<li class="fragment">Faster CI pipeline</li>
+					</ul>
+				</section>
+
+				<section>
+					<img src="img/pipeline.png" alt="pipeline" class="borderless"/>
+					<!---
+					<ul>
+						<li class="fragment">Build docker image</li>
+						<li class="fragment">Run tests, code quality, packaging</li>
+						<li class="fragment">[Optionally] Release bleeding edge version</li>
+						<li class="fragment">[Optionally] Deploy to staging</li>
+						<li class="fragment">Run Integration tests</li>
+						<li class="fragment">Build documentation and publish it</li>
+					</ul>
+					-->
+
+				</section>
+
+				<section>
+					<h2>Cons of plain Docker</h2>
+					<ul>
+						<li class="fragment">Known bugs</li>
+						<li class="fragment">No failover</li>
+						<li class="fragment"><code>dockerd</code> is a single point of failure</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Docker gotchas</h2>
+					<ul>
+						<li class="fragment">PID 1 pitfall</li>
+						<li class="fragment">User permissions within containers</li>
+					</ul>
+				</section>
+			</section>
+
+
+			<section>
+				<section>
+					<h2><img src="img/Kubernetes_logo.svg" alt="Kubernetes" class="borderless"> Ahoy!</h2>
+				</section>
+
+
+				<section>
+					<h2>Warmly welcomed features</h2>
+					<ul>
+						<li class="fragment">Failover when a server fails</li>
+						<li class="fragment">Configuration stored in namespaces</li>
+						<li class="fragment">
+						Service discovery
+						<pre style="min-width: 30em"><code data-trim data-noescape>my-service.my-namespace.svc.cluster.local</code></pre>
+						</li>
+						<li class="fragment">Ingress controller</li>
+						<li class="fragment">
+						Deployment history
+						<pre class="fragment"><code data-trim data-noescape>$ kubectl rollout undo deployment my-app</code></pre>
+						</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h2>Where we are now</h2>
+					<ul>
+						<li class="fragment">Migration to Kubernetes is in progress</li>
+						<li class="fragment">Environment is configured by namespace variables</li>
+						<li class="fragment">Deployments are described in Jinja2 templates
+						<pre style="width: 100%"><code data-trim data-noescape>
+{% set env_type, profile_name = PROFILE.split('_', 1) %}
+{% set namespace = "my-ns-" + env_type %}
+{% set data_directory_mount = '/data' %}
+
+{%  if profile_name == 'cthulu' %}
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: api_key
+        - name: SUBSCRIPTION_INSTRUMENT_FILTER
+          value: 'False'
+{% endif %}</code></pre>
+						</li>
+
+					</ul>
+				</section>
+
+				<section>
+					<h2>Notable features</h2>
+					<ul>
+						<li class="fragment">Probes</li>
+						<li class="fragment">Update strategies</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Update strategies - Rolling update</h2>
+					<img src="img/rollout.png" alt="rolling update" class="borderless"/>
+				</section>
+
+				<section>
+					<h2>Update strategies - Recreate</h2>
+					<img src="img/Recreate.png" alt="recreate" class="borderless"/>
+				</section>
+			</section>
+
+			<section class="thankyou-slide" data-background-color="#000000">
+				<img class="logo" src="img/logo-negative.svg" alt="Quantlane">
+				<br>
+				<h1>Thank you</h1>
+				<h2>
+					<a href="mailto:peter.babics@quantlane.com"><span class="email-name">peter.babics@</span>quantlane.com</a>
+				</h2>
+				<h2>
+					<a href="https://github.com/qntln" class="twitter-link">github.com/qntln</a>
+				</h2>
+			</section>
+		</div>
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+
+	<script>
+		// More info https://github.com/hakimel/reveal.js#configuration
+		Reveal.initialize({
+			history: true,
+
+			// More info https://github.com/hakimel/reveal.js#dependencies
+			dependencies: [
+				{ src: 'plugin/markdown/marked.js' },
+				{ src: 'plugin/markdown/markdown.js' },
+				{ src: 'plugin/notes/notes.js', async: true },
+				{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+			]
+		});
+	</script>
+</body>
+</html>
