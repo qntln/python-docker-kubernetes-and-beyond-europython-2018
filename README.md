@@ -1,3 +1,3 @@
-# Python, Docker, Kubernetes and beyond ?
+# Python, Docker, Kubernetes and beyond?
 
-This repository contains slide of talk `Python, Docker, Kubernetes and beyond ?`, presented at EuroPython 2018
+This repository contains slides for the talk 'Python, Docker, Kubernetes and beyond?' presented at EuroPython 2018 by Peter Babics.
